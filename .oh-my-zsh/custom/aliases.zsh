@@ -1,0 +1,5 @@
+alias ls='ls -al'
+alias hosts='mate /etc/hosts'
+alias getIP='wget -qO- http://ipecho.net/plain ; echo'
+alias open-ports='lsof -i -P | grep -i "listen"'
+alias ssh-copy-id='ssh-copy-id -i ~/.ssh/id_rsa.pub'
