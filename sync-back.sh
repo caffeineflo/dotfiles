@@ -61,6 +61,13 @@ function syncBack() {
         fi
     done
     
+    # Sync iTerm2 preferences
+    if [ -f "$HOME/Library/Preferences/com.googlecode.iterm2.plist" ]; then
+        echo "Syncing iTerm2 preferences..."
+        mkdir -p ./iterm2
+        cp "$HOME/Library/Preferences/com.googlecode.iterm2.plist" "./iterm2/com.googlecode.iterm2.plist"
+    fi
+    
     echo "Sync complete!"
 }
 
@@ -83,6 +90,17 @@ function showChanges() {
             echo "NEW: $file"
         fi
     done
+    
+    # Check iTerm2 preferences
+    if [ -f "$HOME/Library/Preferences/com.googlecode.iterm2.plist" ]; then
+        if [ -f "./iterm2/com.googlecode.iterm2.plist" ]; then
+            if ! cmp -s "$HOME/Library/Preferences/com.googlecode.iterm2.plist" "./iterm2/com.googlecode.iterm2.plist"; then
+                echo "MODIFIED: iTerm2 preferences"
+            fi
+        else
+            echo "NEW: iTerm2 preferences"
+        fi
+    fi
 }
 
 case "$1" in

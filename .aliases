@@ -34,7 +34,7 @@ alias la="ls -lAF ${colorflag}"
 alias lsd="ls -lF ${colorflag} | grep --color=never '^d'"
 
 # Always use color output for `ls`
-alias ls="command ls ${colorflag}"
+# alias ls="command ls ${colorflag}"
 
 # Always enable colored `grep` output
 # Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
@@ -146,3 +146,5 @@ alias reload="exec ${SHELL} -l"
 
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
+
+alias tower='gittower'
