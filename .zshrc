@@ -22,6 +22,7 @@ plugins=(
     colored-man-pages
     vscode
     sudo
+    ssh
     z
     zsh-syntax-highlighting
     zsh-autosuggestions
