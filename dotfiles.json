@@ -102,5 +102,9 @@
   {
     "repo": "iterm2/com.googlecode.iterm2.plist",
     "home": "Library/Preferences/com.googlecode.iterm2.plist"
+  },
+  {
+    "repo": "iterm2/SolarizedDark.json",
+    "home": "Library/Application Support/iTerm2/DynamicProfiles/SolarizedDark.json"
   }
 ]

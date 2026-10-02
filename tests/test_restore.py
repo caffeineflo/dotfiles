@@ -56,6 +56,27 @@ class RestoreTest(unittest.TestCase):
         result = self.run_script("bootstrap.sh", "--apply")
         self.assertEqual((result.returncode, (self.home / ".zshrc").read_text()), (0, "# captured shell\n"))
 
+    def test_only_restores_the_selected_configuration(self):
+        result = self.run_script("bootstrap.sh", "--only", "git", "--apply")
+        self.assertEqual(
+            (result.returncode, sorted(path.name for path in self.home.iterdir())),
+            (0, [".gitignore"]),
+        )
+
+    def test_only_captures_the_selected_configuration(self):
+        (self.home / ".zshrc").write_text("# unrelated shell change\n")
+        (self.home / ".gitignore").write_text("*.log\n")
+        result = self.run_script("sync-back.sh", "--only", "git/", "--apply")
+        self.assertEqual(
+            (result.returncode, (self.repository / ".zshrc").read_text(),
+             (self.repository / "git/global-ignore").read_text().splitlines()[0]),
+            (0, "# captured shell\n", "*.log"),
+        )
+
+    def test_unknown_only_selection_fails_without_writing(self):
+        result = self.run_script("bootstrap.sh", "--only", "missing", "--replace")
+        self.assertEqual((result.returncode, list(self.home.iterdir())), (2, []))
+
     def test_replace_keeps_original_configuration_in_backup(self):
         (self.home / ".zshrc").write_text("# newer local shell\n")
         result = self.run_script("bootstrap.sh", "--replace")

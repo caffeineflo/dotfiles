@@ -40,6 +40,35 @@ You can exercise restoration without touching your real home:
 ./bootstrap.sh --home /path/to/isolated-home --apply --install-shell
 ```
 
+## Update iTerm on another Mac
+
+The restore manifest includes both iTerm preferences and `iterm2/SolarizedDark.json`.
+The dynamic profile selects the repaired Solarized palette, Fira Code Nerd Font
+Mono 13 with ligatures, a 145x40 window, and close confirmations. Its
+`Rewritable: false` setting keeps iTerm from rewriting the profile file.
+The fallback profile carries the same appearance,
+including 1.1 line spacing, so dynamic profile inheritance doesn't change the look.
+Quit confirmation is enabled; Cmd-Q still ends running jobs.
+
+Pull the latest dotfiles, then preview only the iTerm changes:
+
+```bash
+git pull --ff-only
+brew install --cask font-fira-code-nerd-font
+./bootstrap.sh --only iterm2 --diff
+```
+
+Quit iTerm normally when your sessions can end, then run this from Terminal.app:
+
+```bash
+./bootstrap.sh --only iterm2 --replace
+```
+
+This backs up and replaces the managed iTerm files without changing shell, Git,
+or Vim configuration. Reopen iTerm to load the new default profile. New windows
+use the 145x40 size. Other Macs receive updates when you pull and run this command;
+the repository doesn't push settings to running apps automatically.
+
 ## Capture changes from this Mac
 
 ```bash
@@ -51,6 +80,10 @@ git diff
 ```
 
 Capture checks every manifest entry, including custom shell files and iTerm preferences. It removes literal credential exports, adds guards for optional startup dependencies, and omits iTerm command history, window positions, and update caches. Differences in those excluded values don't count as configuration drift.
+
+Use `--only iterm2` with `sync-back.sh` to preview or capture just the iTerm
+preferences and dynamic profile. `--only` accepts a repository file or directory
+from `dotfiles.json` and also works with `bootstrap.sh`.
 
 Repository files replaced during capture are backed up under `fharr/backups/`. Missing live files are reported and their repository copies are preserved; remove an obsolete entry from both the manifest and Git after reviewing it. Oh My Zsh core and plugin trees, Vim swaps, and local `bin` executables aren't captured.
 

@@ -71,6 +71,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("operation", choices=["install", "capture"])
     parser.add_argument("--home", type=Path, default=Path.home())
+    parser.add_argument("--only", metavar="REPO_PATH", help="Limit capture or restore to one manifest file or directory, e.g. iterm2")
     actions = parser.add_mutually_exclusive_group()
     actions.add_argument("--apply", action="store_true", help="Write changes; preserve existing restore conflicts")
     actions.add_argument("--replace", "--force", "-f", action="store_true", help="Write changes with backups, including restore conflicts")
@@ -86,6 +87,15 @@ def main():
         parser.error("--install-shell requires install --apply or --replace")
 
     entries = json.loads((ROOT / "dotfiles.json").read_text())
+    if args.only is not None:
+        selected = args.only.rstrip("/")
+        entries = [entry for entry in entries
+                   if entry["repo"] == selected or entry["repo"].startswith(selected + "/")]
+        if not entries:
+            parser.error(f"No managed files match --only {args.only}")
+    vim_directories = [".vim/backups", ".vim/swaps", ".vim/undo"]
+    if args.only is not None and not any(entry["home"].startswith(".vim") for entry in entries):
+        vim_directories = []
     changes = []
     for entry in entries:
         repository_file = ROOT / entry["repo"]
@@ -136,7 +146,7 @@ def main():
     if backup_base.is_symlink() or (backup_base.exists() and not backup_base.is_dir()):
         raise RuntimeError(f"Invalid backup directory: {backup_base}")
     if args.operation == "install":
-        for directory in [".vim/backups", ".vim/swaps", ".vim/undo"]:
+        for directory in vim_directories:
             destination = home / directory
             check_destination(destination, home)
             if destination.is_symlink() or (destination.exists() and not destination.is_dir()):
@@ -165,7 +175,7 @@ def main():
         mode = source.stat().st_mode & 0o777 if args.operation == "capture" else 0o644
         write_file(target, data, mode)
     if args.operation == "install":
-        for directory in [".vim/backups", ".vim/swaps", ".vim/undo"]:
+        for directory in vim_directories:
             (home / directory).mkdir(parents=True, exist_ok=True)
     if backup_root:
         print(f"Backups: {backup_root}")
