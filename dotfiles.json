@@ -1,0 +1,106 @@
+[
+  {
+    "repo": ".aliases",
+    "home": ".aliases"
+  },
+  {
+    "repo": ".bash_profile",
+    "home": ".bash_profile"
+  },
+  {
+    "repo": ".bash_prompt",
+    "home": ".bash_prompt"
+  },
+  {
+    "repo": ".bashrc",
+    "home": ".bashrc"
+  },
+  {
+    "repo": ".curlrc",
+    "home": ".curlrc"
+  },
+  {
+    "repo": ".editorconfig",
+    "home": ".editorconfig"
+  },
+  {
+    "repo": ".exports",
+    "home": ".exports"
+  },
+  {
+    "repo": ".functions",
+    "home": ".functions"
+  },
+  {
+    "repo": ".gitattributes",
+    "home": ".gitattributes"
+  },
+  {
+    "repo": ".path",
+    "home": ".path"
+  },
+  {
+    "repo": ".tmux.conf",
+    "home": ".tmux.conf"
+  },
+  {
+    "repo": ".vimrc",
+    "home": ".vimrc"
+  },
+  {
+    "repo": ".wgetrc",
+    "home": ".wgetrc"
+  },
+  {
+    "repo": ".zshrc",
+    "home": ".zshrc"
+  },
+  {
+    "repo": ".zshenv",
+    "home": ".zshenv"
+  },
+  {
+    "repo": ".zprofile",
+    "home": ".zprofile"
+  },
+  {
+    "repo": ".oh-my-zsh/custom/aliases.zsh",
+    "home": ".oh-my-zsh/custom/aliases.zsh"
+  },
+  {
+    "repo": ".oh-my-zsh/custom/env.zsh",
+    "home": ".oh-my-zsh/custom/env.zsh"
+  },
+  {
+    "repo": ".oh-my-zsh/custom/functions.zsh",
+    "home": ".oh-my-zsh/custom/functions.zsh"
+  },
+  {
+    "repo": ".oh-my-zsh/custom/privateclaude.zsh",
+    "home": ".oh-my-zsh/custom/privateclaude.zsh"
+  },
+  {
+    "repo": ".oh-my-zsh/custom/themes/robbyrussell.zsh-theme",
+    "home": ".oh-my-zsh/custom/themes/robbyrussell.zsh-theme"
+  },
+  {
+    "repo": ".vim/colors/solarized.vim",
+    "home": ".vim/colors/solarized.vim"
+  },
+  {
+    "repo": ".vim/syntax/json.vim",
+    "home": ".vim/syntax/json.vim"
+  },
+  {
+    "repo": ".gitconfig",
+    "home": ".gitconfig"
+  },
+  {
+    "repo": "git/global-ignore",
+    "home": ".gitignore"
+  },
+  {
+    "repo": "iterm2/com.googlecode.iterm2.plist",
+    "home": "Library/Preferences/com.googlecode.iterm2.plist"
+  }
+]

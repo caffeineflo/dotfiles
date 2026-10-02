@@ -169,3 +169,115 @@ function o() {
 function tre() {
 	tree -aC -I '.git|node_modules|bower_components' --dirsfirst "$@" | less -FRNX;
 }
+
+# Codex entrypoints. Plain `codex` stays on the shared/default config so the
+# desktop app and remote sessions keep their normal OpenAI auth path.
+function dodex() {
+	command codex --search --dangerously-bypass-approvals-and-sandbox "$@";
+}
+
+function dodex-lb() {
+	command codex --profile codex-lb --dangerously-bypass-approvals-and-sandbox "$@";
+}
+
+function dodex-requesty() {
+	local model="novita/qwen/qwen3.8-max";
+	local reasoning_effort="medium";
+	local requesty_api_key;
+
+	case "$1" in
+		qwen)
+			shift;
+			;;
+		deepseek)
+			model="deepseek/deepseek-v4.1-flash";
+			shift;
+			;;
+		kimi|kimi-k3)
+			model="moonshot/kimi-k3";
+			shift;
+			;;
+		*/*)
+			model="$1";
+			shift;
+			;;
+	esac
+
+	if [ "$1" = "--effort" ]; then
+		case "$2" in
+			minimal|low|medium|high|xhigh)
+				reasoning_effort="$2";
+				shift 2;
+				;;
+			*)
+				echo "Usage: dodex-requesty [qwen|deepseek|kimi|provider/model] [--effort minimal|low|medium|high|xhigh] [codex arguments]" >&2;
+				return 2;
+				;;
+		esac
+	fi
+
+	requesty_api_key="${REQUESTY_API_KEY:-}";
+	if [ -z "$requesty_api_key" ]; then
+		requesty_api_key="$(security find-generic-password -a "$USER" -s requesty-api-key -w 2>/dev/null)";
+	fi
+	if [ -z "$requesty_api_key" ]; then
+		read -rs "requesty_api_key?Requesty API key: ";
+		echo;
+		if [ -z "$requesty_api_key" ]; then
+			echo "A Requesty API key is required." >&2;
+			return 1;
+		fi
+		security add-generic-password -U -a "$USER" -s requesty-api-key -w "$requesty_api_key" >/dev/null || return;
+	fi
+
+	REQUESTY_API_KEY="$requesty_api_key" command codex --profile requesty --model "$model" --config "model_reasoning_effort=\"$reasoning_effort\"" --dangerously-bypass-approvals-and-sandbox "$@";
+}
+
+function dodex-bedrock() {
+	local model="us.openai.gpt-6-astra";
+	local reasoning_effort="medium";
+
+	case "$1" in
+		astra)
+			shift;
+			;;
+		sol|terra|luna)
+			model="us.openai.gpt-5.6-$1";
+			shift;
+			;;
+	esac
+
+	if [ "$1" = "--effort" ]; then
+		case "$2" in
+			minimal|low|medium|high|xhigh)
+				reasoning_effort="$2";
+				shift 2;
+				;;
+			*)
+				echo "Usage: dodex-bedrock [astra|sol|terra|luna] [--effort minimal|low|medium|high|xhigh] [codex arguments]" >&2;
+				return 2;
+				;;
+		esac
+	fi
+
+	AWS_REGION="${AWS_REGION:-us-east-1}" command codex --profile bedrock --model "$model" --config "model_reasoning_effort=\"$reasoning_effort\"" --dangerously-bypass-approvals-and-sandbox "$@";
+}
+
+function dodex-writer() {
+	command codex --profile codex-lb-writer --search --dangerously-bypass-approvals-and-sandbox "$@";
+}
+
+function api-chrome() {
+	local chrome="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+	local port="${API_CHROME_PORT:-9222}";
+
+	"$chrome" \
+		--user-data-dir="$HOME/.agent-api-chrome" \
+		--remote-debugging-port="$port" \
+		>/dev/null 2>&1 &
+}
+
+function codex-api() {
+	api-chrome;
+	command codex --profile api-capture --search --dangerously-bypass-approvals-and-sandbox "$@";
+}

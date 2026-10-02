@@ -12,3 +12,26 @@ Thumbs.db
 # Files that might appear on external disks
 .Spotlight-V100
 .Trashes
+
+# Local state and credentials
+/fharr/
+__pycache__/
+*.swp
+*.swo
+.dotfiles-private.sh
+.mcp.env
+.env
+*.private
+/.claude/settings.local.json
+
+# Keep managed Oh My Zsh configuration only
+/.oh-my-zsh/cache/
+/.oh-my-zsh/custom/plugins/
+
+# Vim runtime files
+/.vim/backups/*
+!/.vim/backups/.gitkeep
+/.vim/swaps/*
+!/.vim/swaps/.gitkeep
+/.vim/undo/*
+!/.vim/undo/.gitkeep

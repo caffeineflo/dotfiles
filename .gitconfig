@@ -150,6 +150,7 @@
 	default = simple
 	# Make `git push` push relevant annotated tags when pushing branches out.
 	followTags = true
+	autoSetupRemote = true
 
 # URL shorthands
 
@@ -176,3 +177,16 @@
 [init]
 
 	defaultBranch = main
+[commit]
+	gpgsign = false
+[gpg]
+	program = /opt/homebrew/bin/gpg
+[user]
+	name = Florian Harr
+	email = harr.florian@gmx.de
+[credential "https://github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/opt/homebrew/bin/gh auth git-credential

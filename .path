@@ -1,2 +1,9 @@
 export PATH="/usr/local/bin:$PATH"
 export PATH="/usr/local/sbin:$PATH"
+if command -v brew >/dev/null 2>&1; then
+    gnu_sed_prefix="$(brew --prefix gnu-sed)"
+    if [ -d "$gnu_sed_prefix/libexec/gnubin" ]; then
+        export PATH="$PATH:$gnu_sed_prefix/libexec/gnubin"
+    fi
+    unset gnu_sed_prefix
+fi

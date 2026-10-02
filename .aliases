@@ -34,7 +34,7 @@ alias la="ls -lAF ${colorflag}"
 alias lsd="ls -lF ${colorflag} | grep --color=never '^d'"
 
 # Always use color output for `ls`
-# alias ls="command ls ${colorflag}"
+alias ls="command ls ${colorflag}"
 
 # Always enable colored `grep` output
 # Note: `GREP_OPTIONS="--color=auto"` is deprecated, hence the alias usage.
@@ -42,14 +42,18 @@ alias grep='grep --color=auto'
 alias fgrep='fgrep --color=auto'
 alias egrep='egrep --color=auto'
 
-# Enable aliases to be sudo’ed
+# Enable aliases to be sudo'ed
 alias sudo='sudo '
 
 # Get week number
 alias week='date +%V'
 
+# Homebrew cleanup that also removes cached .pkg/.dmg installers from Caskroom
+# (brew cleanup intentionally skips these -- this finishes the job)
+alias brew-clean='brew cleanup && find "$(brew --prefix)/Caskroom" -type f \( -name "*.pkg" -o -name "*.dmg" \) -delete'
+
 # Get macOS Software Updates, and update installed Ruby gems, Homebrew, npm, and their installed packages
-alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew cleanup; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
+alias update='sudo softwareupdate -i -a; brew update; brew upgrade; brew-clean; npm install npm -g; npm update -g; sudo gem update --system; sudo gem update; sudo gem cleanup'
 
 # Google Chrome
 alias chrome='/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome'
@@ -66,7 +70,7 @@ alias ifactive="ifconfig | pcregrep -M -o '^[^\t:]+:([^\n]|\n\t)*status: active'
 # Flush Directory Service cache
 alias flush="dscacheutil -flushcache && killall -HUP mDNSResponder"
 
-# Clean up LaunchServices to remove duplicates in the “Open With” menu
+# Clean up LaunchServices to remove duplicates in the "Open With" menu
 alias lscleanup="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister -kill -r -domain local -domain system -domain user && killall Finder"
 
 # Canonical hex dump; some systems have this symlinked
@@ -90,7 +94,7 @@ alias c="tr -d '\n' | pbcopy"
 alias cleanup="find . -type f -name '*.DS_Store' -ls -delete"
 
 # Empty the Trash on all mounted volumes and the main HDD.
-# Also, clear Apple’s System Logs to improve shell startup speed.
+# Also, clear Apple's System Logs to improve shell startup speed.
 # Finally, clear download history from quarantine. https://mths.be/bum
 alias emptytrash="sudo rm -rfv /Volumes/*/.Trashes; sudo rm -rfv ~/.Trash; sudo rm -rfv /private/var/log/asl/*.asl; sqlite3 ~/Library/Preferences/com.apple.LaunchServices.QuarantineEventsV* 'delete from LSQuarantineEvent'"
 
@@ -114,7 +118,7 @@ alias spotoff="sudo mdutil -a -i off"
 # Enable Spotlight
 alias spoton="sudo mdutil -a -i on"
 
-# PlistBuddy alias, because sometimes `defaults` just doesn’t cut it
+# PlistBuddy alias, because sometimes `defaults` just doesn't cut it
 alias plistbuddy="/usr/libexec/PlistBuddy"
 
 # Airport CLI alias
@@ -125,7 +129,7 @@ alias airport='/System/Library/PrivateFrameworks/Apple80211.framework/Versions/C
 # find . -name .gitattributes | map dirname
 alias map="xargs -n1"
 
-# One of @janmoesen’s ProTip™s
+# One of @janmoesen's ProTip™s
 for method in GET HEAD POST PUT DELETE TRACE OPTIONS; do
 	alias "${method}"="lwp-request -m '${method}'"
 done
@@ -147,4 +151,6 @@ alias reload="exec ${SHELL} -l"
 # Print each PATH entry on a separate line
 alias path='echo -e ${PATH//:/\\n}'
 
-alias tower='gittower'
+# Toggle the secondary Dell display used with VNC.
+alias monitor2off='displayplacer "id:CF8B8632-A06C-47AB-982C-C6F95CF8143C enabled:false"'
+alias monitor2on='displayplacer "id:CF8B8632-A06C-47AB-982C-C6F95CF8143C enabled:true"'

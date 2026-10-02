@@ -1,111 +1,100 @@
-# Mathias’s dotfiles
+# Florian's dotfiles
 
-![Screenshot of my shell prompt](https://i.imgur.com/EkEtphC.png)
+This repository captures the current Mac's shell, Git, Vim, tmux, and iTerm preferences. The baseline was refreshed on October 2, 2026, on an Apple Silicon Mac running macOS 27. This Mac is the source of truth for future captures.
 
-## Installation
+`dotfiles.json` lists every file that capture and restore manage. Scripts don't copy arbitrary repository files, framework trees, caches, or authentication databases. Package installation and macOS preference changes have their own explicit commands.
 
-**Warning:** If you want to give these dotfiles a try, you should first fork this repository, review the code, and remove things you don’t want or need. Don’t blindly use my settings unless you know what that entails. Use at your own risk!
+## Restore
 
-### Using Git and the bootstrap script
-
-You can clone the repository wherever you want. (I like to keep it in `~/Projects/dotfiles`, with `~/dotfiles` as a symlink.) The bootstrapper script will pull in the latest version and copy the files to your home folder.
+Install Xcode Command Line Tools and [Homebrew](https://brew.sh/) first. The scripts use `/usr/bin/python3` from the Command Line Tools and require Git for shell dependency installation.
 
 ```bash
-git clone https://github.com/mathiasbynens/dotfiles.git && cd dotfiles && source bootstrap.sh
+git clone https://github.com/caffeineflo/dotfiles.git
+cd dotfiles
+./bootstrap.sh
 ```
 
-To update, `cd` into your local `dotfiles` repository and then:
+The default command only previews changes. Run scripts as executables; don't source them into your shell.
+
+For a new home directory, install missing configuration and the Oh My Zsh framework/plugins:
 
 ```bash
-source bootstrap.sh
+./bootstrap.sh --apply --install-shell
 ```
 
-Alternatively, to update while avoiding the confirmation prompt:
+`--apply` preserves differing existing files. Review a diff before choosing to replace them:
 
 ```bash
-set -- -f; source bootstrap.sh
+./bootstrap.sh --diff
+./bootstrap.sh --replace
 ```
 
-### Git-free install
+Replacement saves every affected original under `~/.dotfiles-backups/<timestamp>/` before writing configuration. Backups include symlinks and private values, so keep that directory private. Literal credential exports from replaced shell files move into `~/.dotfiles-private.sh` with mode `600`; Bash and zsh load that file. Existing private exports are retained.
 
-To install these dotfiles without Git:
+Close iTerm before explicitly replacing its preferences. Open a new login shell after restoration. The installer doesn't restart apps, source shell files, pull Git changes, or upgrade existing plugins.
+
+You can exercise restoration without touching your real home:
 
 ```bash
-cd; curl -#L https://github.com/mathiasbynens/dotfiles/tarball/main | tar -xzv --strip-components 1 --exclude={README.md,bootstrap.sh,.osx,LICENSE-MIT.txt}
+./bootstrap.sh --home /path/to/isolated-home
+./bootstrap.sh --home /path/to/isolated-home --apply --install-shell
 ```
 
-To update later on, just run that command again.
-
-### Specify the `$PATH`
-
-If `~/.path` exists, it will be sourced along with the other files, before any feature testing (such as [detecting which version of `ls` is being used](https://github.com/mathiasbynens/dotfiles/blob/aff769fd75225d8f2e481185a71d5e05b76002dc/.aliases#L21-L26)) takes place.
-
-Here’s an example `~/.path` file that adds `/usr/local/bin` to the `$PATH`:
+## Capture changes from this Mac
 
 ```bash
-export PATH="/usr/local/bin:$PATH"
+./sync-back.sh --check
+./sync-back.sh --diff
+./sync-back.sh --apply
+git diff --check
+git diff
 ```
 
-### Add custom commands without creating a new fork
+Capture checks every manifest entry, including custom shell files and iTerm preferences. It removes literal credential exports, adds guards for optional startup dependencies, and omits iTerm command history, window positions, and update caches. Differences in those excluded values don't count as configuration drift.
 
-If `~/.extra` exists, it will be sourced along with the other files. You can use this to add a few custom commands without the need to fork this entire repository, or to add commands you don’t want to commit to a public repository.
+Repository files replaced during capture are backed up under `fharr/backups/`. Missing live files are reported and their repository copies are preserved; remove an obsolete entry from both the manifest and Git after reviewing it. Oh My Zsh core and plugin trees, Vim swaps, and local `bin` executables aren't captured.
 
-My `~/.extra` looks something like this:
+The repository ignore file and your global ignore file serve different purposes. `git/global-ignore` restores to `~/.gitignore`; the root `.gitignore` protects this checkout's private and generated files.
 
-```bash
-# Git credentials
-# Not in the repository, to prevent people from accidentally committing under my name
-GIT_AUTHOR_NAME="Mathias Bynens"
-GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
-git config --global user.name "$GIT_AUTHOR_NAME"
-GIT_AUTHOR_EMAIL="mathias@mailinator.com"
-GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
-git config --global user.email "$GIT_AUTHOR_EMAIL"
-```
+## Packages and macOS preferences
 
-You could also use `~/.extra` to override settings, functions and aliases from my dotfiles repository. It’s probably better to [fork this repository](https://github.com/mathiasbynens/dotfiles/fork) instead, though.
-
-### Sensible macOS defaults
-
-When setting up a new Mac, you may want to set some sensible macOS defaults:
-
-```bash
-./.macos
-```
-
-### Install Homebrew formulae
-
-When setting up a new Mac, you may want to install some common [Homebrew](https://brew.sh/) formulae (after installing Homebrew, of course):
+The `Brewfile` records supported formulae you requested, installed casks, and taps. Dependencies resolve through Homebrew. Unsupported or deprecated installed packages remain documented as comments.
 
 ```bash
 ./brew.sh
+./brew.sh --install
+./.macos
+./.macos --apply
 ```
 
-Some of the functionality of these dotfiles depends on formulae installed by `brew.sh`. If you don’t plan to run `brew.sh`, you should look carefully through the script and manually install any particularly important ones. A good example is Bash/Git completion: the dotfiles use a special version from Homebrew.
+Package checks are read-only. Installation doesn't upgrade existing packages or clean their caches. The macOS recipe captures stored preferences from this Mac and requires an explicit apply step; it doesn't rebuild Spotlight or reset application layouts. Read each command's help before applying it on another machine.
 
-## Feedback
+## Credentials and companion configuration
 
-Suggestions/improvements
-[welcome](https://github.com/mathiasbynens/dotfiles/issues)!
+Keep `~/.dotfiles-private.sh` outside Git. On a new Mac, create it with mode `600` and supply `METAMCP_API_KEY` and `HOMEBREW_GITHUB_API_TOKEN` through your password manager or Keychain-backed commands. Bootstrap preserves existing credentials but doesn't recover them from Git history.
 
-## Author
+The shell launchers rely on separately maintained repositories:
 
-| [![twitter/mathias](http://gravatar.com/avatar/24e08a9ea84deb17ae121074d0f17125?s=70)](http://twitter.com/mathias "Follow @mathias on Twitter") |
-|---|
-| [Mathias Bynens](https://mathiasbynens.be/) |
+- [claude-config](https://github.com/caffeineflo/claude-config) at `~/.claude`, including profiles, writing style, shared MCP configuration, and the API proxy.
+- [codex-config](https://github.com/caffeineflo/codex-config) at `~/.codex`, including the launcher profiles.
 
-## Thanks to…
+Restore those repositories through their own setup instructions. Authentication sessions, Keychain items, SSH keys/configuration, Rust installation, and personal application data require separate restoration. Referenced Keychain services are `ha-mcp-token`, `requesty-api-key`, `heineken-rebates-agent-token`, `codex-lb-api-key`, `bedrockclaude-aws-bearer-token`, and `privateclaude-oauth-token`.
 
-* @ptb and [his _macOS Setup_ repository](https://github.com/ptb/mac-setup)
-* [Ben Alman](http://benalman.com/) and his [dotfiles repository](https://github.com/cowboy/dotfiles)
-* [Cătălin Mariș](https://github.com/alrra) and his [dotfiles repository](https://github.com/alrra/dotfiles)
-* [Gianni Chiappetta](https://butt.zone/) for sharing his [amazing collection of dotfiles](https://github.com/gf3/dotfiles)
-* [Jan Moesen](http://jan.moesen.nu/) and his [ancient `.bash_profile`](https://gist.github.com/1156154) + [shiny _tilde_ repository](https://github.com/janmoesen/tilde)
-* Lauri ‘Lri’ Ranta for sharing [loads of hidden preferences](https://web.archive.org/web/20161104144204/http://osxnotes.net/defaults.html)
-* [Matijs Brinkhuis](https://matijs.brinkhu.is/) and his [dotfiles repository](https://github.com/matijs/dotfiles)
-* [Nicolas Gallagher](http://nicolasgallagher.com/) and his [dotfiles repository](https://github.com/necolas/dotfiles)
-* [Sindre Sorhus](https://sindresorhus.com/)
-* [Tom Ryder](https://sanctum.geek.nz/) and his [dotfiles repository](https://sanctum.geek.nz/cgit/dotfiles.git/about)
-* [Kevin Suttle](http://kevinsuttle.com/) and his [dotfiles repository](https://github.com/kevinSuttle/dotfiles) and [macOS-Defaults project](https://github.com/kevinSuttle/macOS-Defaults), which aims to provide better documentation for [`~/.macos`](https://mths.be/macos)
-* [Haralan Dobrev](https://hkdobrev.com/)
-* Anyone who [contributed a patch](https://github.com/mathiasbynens/dotfiles/contributors) or [made a helpful suggestion](https://github.com/mathiasbynens/dotfiles/issues)
+The configuration uses `/Volumes/ExternalSSD` for developer caches, Colima, and PlatformIO. Mount that volume or adjust those paths before using the related tools. Display aliases also use this Mac's monitor identifiers. These settings are preserved intentionally.
+
+Some legacy aliases remain because they still exist on this Mac, including Python 2 helpers and old `airport`/screen-lock paths. Capturing them doesn't establish that their commands work on current macOS. Historical `init` presets and `bin/subl` aren't part of the restore manifest.
+
+## Verify changes
+
+```bash
+/usr/bin/python3 -m unittest discover -s tests -v
+shellcheck -x bootstrap.sh sync-back.sh brew.sh .macos
+gitleaks dir --redact --no-banner .
+./sync-back.sh --check
+```
+
+The restore tests use isolated directories under ignored `fharr/`. They exercise conflict preservation, backups, credential removal and migration, symlink handling, manifest boundaries, and repeated installation.
+
+A Homebrew GitHub API token remains in historical commit `e05d428`. Rotate or revoke it if that's still outstanding. Scanning the current directory is clean; scanning full history still flags that old commit. This update doesn't rewrite published history.
+
+Derived from [Mathias Bynens' dotfiles](https://github.com/mathiasbynens/dotfiles). The original MIT license remains in `LICENSE-MIT.txt`.
